@@ -8,11 +8,17 @@ There are two ways to use this application:
       2) Run downloader (Windows may flag as a virus)
  * Running Source Code Locally(Requires Python 3.12+):
       1) Download this Repository
+         
          a) Click Green Button "Code"
+
          b) Download as ZIP
-      2) Run the python file `main.pyw`
+
+      3) Run the python file `main.pyw`
+
          a) This can be achieved via the command `py main.pyw` in the root directory of the application
-      3) Compile Locally to Executable (Optional)
+
+      5) Compile Locally to Executable (Optional)
+
          You can use Pyinstaller or Nuitka (Both are python to executable solutions) to convert your local source code into a runnable file. For instructions on how to use each tool, you can visit their respective docs (https://pyinstaller.org/en/stable/ and https://nuitka.net/)
 
 
