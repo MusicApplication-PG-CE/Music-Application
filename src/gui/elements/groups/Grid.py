@@ -1,4 +1,5 @@
 from ...core import *
+from ... import settings
 from ...utils import utils
 from ..positioners import Resizer
 
@@ -83,12 +84,11 @@ class Grid(DrawBase):
         if wheel and self.rect.collidepoint(input.mpos):
             if (size[0]> self.rect.width and size[1] <self.rect.height) or input.lctrl:
                 #scroll horizonally
-                self.scroll_x += wheel * WHEEL_SENSITIVITY
+                self.scroll_x += wheel * settings.wheel_sensitivity
                 if self.scroll_x < 0: self.scroll_x = 0
                 elif self.scroll_x > max_scroll[0]: self.scroll_x = max_scroll[0]
-
             else:
-                self.scroll_y += wheel * WHEEL_SENSITIVITY
+                self.scroll_y += wheel * settings.wheel_sensitivity
                 if self.scroll_y < 0: self.scroll_y = 0
                 elif self.scroll_y > max_scroll[1]: self.scroll_y = max_scroll[1]
                 #scroll vertically (normal)

@@ -145,7 +145,7 @@ class FileDependency(Dependency):
 
     def hasDependency(self) -> bool:
         path = os.path.abspath(self.path)
-        print(f'Looking for {self.name} at: {(path)}')
+        if __debug__:   print(f'Looking for {self.name} at: {(path)}')
         assert os.path.isfile(path)==os.path.isfile(self.path)
         return os.path.isfile(self.path)
     

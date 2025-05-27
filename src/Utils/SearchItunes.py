@@ -117,7 +117,7 @@ class ITunesSearch:
 
 
     def sendQuery(self,query:str,limit:int|None=None,__i:int=0):
-        '''This is the function that will begin the query to Youtube's Inner API'''
+        '''This is the function that will begin the query to Itunes API'''
         if self.url is not None: #there is a request in progress
             raise RuntimeError 
         query = percentEncode(query)

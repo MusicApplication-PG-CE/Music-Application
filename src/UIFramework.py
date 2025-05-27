@@ -2737,6 +2737,10 @@ class BatchDownloadSongs(ForceFocusOptionsBase):
             s.rating = 'Unrated'
             s.bit_rate_kbps = 1536
             s.length_seconds = song.length_seconds
+            s.release_date = song.release_date or 'Unknown'
+            s.genre = song.genre or 'Unknown'
+            s.track_number = song.track_number or -1
+            s.explicit = bool(song.explicit)
             s.language = 'en'
             try:
                 database.addSong(s)
@@ -2794,7 +2798,7 @@ class PlaylistInfoScreen(Region):
             BackgroundColor((10,10,10)),
             Aligner(
                 AddText(
-                    Button((-2,0),(90,24),ColorScheme(80,140,80),None,lambda :toNone(self.removeLayer(),downloadBatch(self.songs))), #type: ignore
+                    Button((-2,0),(90,24),ColorScheme(80,140,80),None,lambda :toNone(base_layer.removeLayer(self.layer),downloadBatch(self.songs))), #type: ignore
                     'Download',(255,255,255),subtitle_font,
 
                 ),0.5,0.5,1

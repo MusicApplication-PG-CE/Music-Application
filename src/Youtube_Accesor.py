@@ -52,7 +52,7 @@ def __download(url:str,onDone:typing.Callable,onUpdate:typing.Callable|None):
     if not url.startswith('https://'):
         url = 'https://'+url
     try:
-        cmd = subprocess.Popen(['yt-dlp.exe','-x','--audio-format','vorbis',url,'--print','after_move:filepath','--progress','--embed-metadata'],stdout=PIPE,creationflags=subprocess.CREATE_NO_WINDOW,text=True)
+        cmd = subprocess.Popen(['dep/yt-dlp.exe','-x','--audio-format','vorbis',url,'--print','after_move:filepath','--progress','--embed-metadata'],stdout=PIPE,creationflags=subprocess.CREATE_NO_WINDOW,text=True)
         logger.log("created Popen for url:",url)
         output = []
         last = ''

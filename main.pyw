@@ -206,7 +206,6 @@ def setBorderless(borderless:bool):
     n_size = window.size[0],window.size[1] + (30 if borderless else -30)
     new_pos = (pygame.Vector2(window.position) + pygame.Vector2(p_size) - pygame.Vector2(n_size))
     
-
     window.position = new_pos.x,new_pos.y
     window.size = n_size
     window.borderless = borderless
@@ -549,7 +548,7 @@ def setAppState(state:int):
       settings.miniplayer_pos = int(new_pos.x),int(new_pos.y)
     else:
       new_pos = pygame.Vector2(settings.miniplayer_pos)
-    window.size = tuple(settings.miniplayer_size)
+    new_size = tuple(settings.miniplayer_size)
     window.resizable = True
     window.borderless = settings.miniplayer_borderless
     window.always_on_top = settings.miniplayer_always_on_top
@@ -559,14 +558,15 @@ def setAppState(state:int):
       settings.miniplayer_pos = window.position
       settings.miniplayer_size = list(window.size)
     window.minimum_size = (650,400)
-    window.size=(900,600)
-    new_pos = (pygame.Vector2(window.position) + pygame.Vector2(p_size) - pygame.Vector2(window.size))
+    new_size = (900,600)
+    new_pos = (pygame.Vector2(window.position) + pygame.Vector2(p_size) - pygame.Vector2(new_size))
     window.resizable = True
     window.borderless = settings.borderless
     window.always_on_top = False
     base = base_layer
   else: raise ValueError
   window.position = max(0,new_pos.x),max(30,new_pos.y)
+  window.size=new_size
   app_state = state
 settings_value_mp_borderless = settings.makeSharedSettingsValue('miniplayer_borderless')
 settings_value_mp_always_on_top = settings.makeSharedSettingsValue('miniplayer_always_on_top')
@@ -597,7 +597,6 @@ try:
     myInput.mousey = g_mpos[1] - window.position[1]
     if __debug__:
       t_a = time.perf_counter()
-
     if app_state == STATE_MINIPLAYER:
       if myInput.windowLeave: 
         reg.setActive(False)
@@ -609,16 +608,15 @@ try:
     if next_app_state is not None:
       setAppState(next_app_state)
       next_app_state = None
-    if myInput.quitEvent:
+    if myInput.quitEvent: 
       break
-    if window.borderless:
-      c_border.update(myInput)
-    if window.size != base.rect.size:
-      base.resize(window.size)
-      title_bar.resize((window.size[0],30))
-    if window.borderless:
-      title_bar.update(myInput)
 
+    if window.borderless: c_border.update(myInput)
+    if window.size != base.rect.size: base.resize(window.size)
+    if title_bar.rect.width != window.size[0]: title_bar.resize((window.size[0],30))
+
+    if app_state == STATE_MAINAPP and window.borderless:
+      title_bar.update(myInput)
       title_bar.draw(screen)
     if __debug__:
       end = False
@@ -639,19 +637,24 @@ try:
         break
     window.flip()
     dt = clock.tick(settings.fps) / 1_000
+  logger.log('[App Shutdown] No Exceptions Raised')
 except SystemExit:
-  pass
+  logger.log('[App Shutdown] SystemExit raised')
 except KeyboardInterrupt:
-  pass
+  logger.log('[App Shutdown] KeyboardInterrupt raised')
 except BaseException as base_err:
+  logger.log(f'[App Shutdown] {base_err.__class__.__name__} raised')
   import traceback
-  import time
+  dump_name = f"./ExceptionDump {time.ctime().replace(':',' ')}.dmp"
   try:
-    with open(f"./ExceptionDump {time.ctime().replace(':',' ')}.dmp",'w+') as file:
+    with open(dump_name,'w+') as file:
       traceback.print_exception(base_err,file=file)
   except:
     logger.log("Exception Writing ExceptionDump")
-  raise base_err
+  fq_dump_name = os.path.abspath(dump_name)
+  response = pygame.display.message_box('An Error Has Occured :3',f'LOL an error has occured, I honestly dont know how but something bad happened. Please notify a developer or whever you obtained a copy of this application. Developer Info: DumpPath: {fq_dump_name}','error',None,('OK','Finee....','NO',))
+  if response in (0,1):
+    raise base_err
 finally:
   #on quit
   settings.unlock()
@@ -660,5 +663,4 @@ finally:
   settings.repeat_level = MusicPlayer.songQueue.repeat_level
   settings.lock() 
   keybinds.save()
-
 Tracer().show()

@@ -5,21 +5,24 @@ def parseVideoRenderer2(b:bytes):
     c = utils.indexEnd(b,b'videoId":"')
     videoId,c = utils.findEndOfQuote(b,c)
 
-    # videoId,a = readString(b,b'videoId": "',b'"')
     c = utils.indexEnd(b,b'thumbnails":',c)
     thumbnails,c = utils.readFast(b,b']',c)
-    # thumbnails,a = readString(a,b'thumbnails": [',b']')
     c = utils.indexEnd(b,b'text":"')
     title,c = utils.findEndOfQuote(b,c)
 
     # title,a = readString(a,b'text": "',b'\n')
 
     # title = title.strip()[:-1]
-    c = utils.indexEnd(b,b'label":"',c)
-    views,c = utils.findEndOfQuote(b,c)
-    views_stop = views.rindex(b' view')
-    views_start = views.rindex(b' ',None,views_stop)+1
-    views = views[views_start:views_stop].replace(b',',b'')
+    try:
+        c = utils.indexEnd(b,b'label":"',c)
+        
+        views,c = utils.findEndOfQuote(b,c)
+        views_stop = views.rindex(b' view')
+        views_start = views.rindex(b' ',None,views_stop)+1
+        views = views[views_start:views_stop].replace(b',',b'')
+    except:
+        print(views)
+        views = -1
 
 
     # try:int(views)
@@ -38,6 +41,18 @@ def parseVideoRenderer2(b:bytes):
     c = utils.indexEnd(b,b'lengthSeconds":"',c)
     length,c = utils.findEndOfQuote(b,c)
     # len_secs,a = readString(a,b'lengthSeconds": "',b'"')    
+    if views == -1:
+        c = utils.indexEnd(b,b'videoInfo":',c)    
+        c = utils.indexEnd(b,b'text":"',c)
+        b_views,c = utils.findEndOfQuote(b,c)
+        if b'view' in b_views:
+            b_views,_ = b_views.split(b' view',1)
+            suffix = b_views[-1:]
+            if suffix.isdigit():
+                views = int(suffix)
+            else:
+                mult = {'k'.casefold():1_000,'m'.casefold():1_000_000,'b'.casefold():1_000_000_000}[suffix.decode().casefold()]
+                views = float(b_views[:-1].decode()) * mult
 
 
     channel = types.Channel()
@@ -78,4 +93,13 @@ def parse(b:bytes):
         cont = cont.decode()
     else:
         cont = None
-    return [parseVideoRenderer2(v) for v in vids],cont
+    out = []
+    for v in vids:
+        try:
+            out.append(parseVideoRenderer2(v))
+        except ValueError:
+            import logger
+            logger.log('[Error] in parseVideoRenderer2. This is likely due to Youtube changing the json served on a whim *sigh*')
+
+    return out,cont
+    # return [parseVideoRenderer2(v) for v in vids],cont
