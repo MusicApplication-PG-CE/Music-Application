@@ -46,8 +46,11 @@ if to_install := [dep for dep in Installer.dependencies if not dep.hasDependency
       #this runs in another thread 
       for dep in to_install:
         try:
+          logger.log(f'Installing Dependency {dep.name}')
           dep.installDependency(pipe)
+          logger.log(f'Successfully Installed {dep.name}')
         except ConnectionError:
+
           pipe.title.set('Connection Error')
           pipe.description.set('Ensure you have a stable Internet Connection')
           return

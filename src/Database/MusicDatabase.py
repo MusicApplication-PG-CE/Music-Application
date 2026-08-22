@@ -256,7 +256,7 @@ class Database:
             s.size_bytes = songData['Size']
             s.release_date = songData.get('Release Date','Unknown')
             s.genre = songData.get('Genre','')
-            s.track_number = int(songData.get('Track Number',0))
+            s.track_number = int(songData.get('Track Number',0) or 0)
             s.explicit = bool(songData.get('Explicit',False))
             s._fileName = songData['File Name']
             self._addSongNoEventFire(s)

@@ -1795,8 +1795,13 @@ class DownloadingScreenOptions(ForceFocusOptionsBase):
             s.explicit = self.song.explicit
             s.track_number = self.song.track_number
             s.genre = self.song.genre
-            database.addSong(s)
-            database.saveAllSongs()
+            try:
+                database.addSong(s)
+            except ValueError:
+                #This song filename aready exists in the database
+                pass
+            else:
+                database.saveAllSongs()
             self.removeLayer()
 
         downloadURLAsync(song._fileName,onDone,onUpdate)

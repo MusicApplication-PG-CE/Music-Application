@@ -1,4 +1,5 @@
 from typing import Any,Final,final
+import os
 try: from .Singleton import Singleton
 except: from Singleton import Singleton
 
@@ -9,7 +10,10 @@ class PersistantObject(Singleton):
     
     def __init_subclass__(cls) -> None:
         if not hasattr(cls,'_file'):
-            raise SyntaxError("All Subclasses of <PersistantObject> must have a class attribute called, ")
+            raise SyntaxError("All Subclasses of <PersistantObject> must have a class attribute called, _file")
+        else:
+            os.makedirs(os.path.dirname(os.path.abspath(cls._file)),exist_ok=True)
+
         if hasattr(cls,'_lock'):
             raise SyntaxError("<Persistant Object> uses class attribute: _lock. Subclasses cannot define this value")
         cls._lock = True#type: ignore

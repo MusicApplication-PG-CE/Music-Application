@@ -8,9 +8,21 @@ LOGGING = True
 TIMESTAMP = True
 LOG_FILE:str = './log.txt'
 
+def _toString(obj:object) -> str:
+    try:
+        return str(obj)
+    except UnicodeError:
+        try:
+            return bytes.decode(obj,'utf-8','ignore')
+        except:
+            return '<CAN_NOT_DECODE>'
+    except: 
+        return f'<ERROR>'
 __all__ = [
     'log'
 ]
+
+
 
 if LOGGING and not TIMESTAMP:
     def log(*x:object,sep:str = ' ',end:str = '\n'):
@@ -26,17 +38,23 @@ if LOGGING and not TIMESTAMP:
 
 elif LOGGING and TIMESTAMP:
     def log(*x:object,sep:str = ' ',end:str = '\n'):
-        import time
-        s = f'[{time.asctime()}] '+str(sep).join([str(a) for a in x]) + str(end)
-        with open(LOG_FILE,'a+') as file:
-            try:
-                file.write(s)
-            except Exception as err:
-                file.write("Exception Occured in writing to log file!{}\n".format(map(repr,err.args)))
-                import traceback
-                import sys
-                sys.exception
-                traceback.print_stack(sys._getframe(),file=file)
+        try:
+            import time
+            s = f'[{time.asctime()}]'+_toString(sep).join(list(map(_toString,x))) + _toString(end)
+            with open(LOG_FILE,'a+') as file:
+                try:
+                    file.write(s)
+                except Exception as err:
+                    try:
+                        file.write(f"Exception Occured in writing to log file!{[repr(arg) for arg in err.args]}\n")
+                        import traceback
+                        import sys
+                        traceback.print_stack(sys._getframe(),file=file)
+                    except:
+                        file.write(f"Unknown Exception Occured in logging to file.\n")
+        except BaseException as err:
+            print('Exception in Writing to log file.',err)
+            raise err
 else:
     log = print
 
@@ -48,3 +66,5 @@ def dump(filepath:str,content:bytes):
     except:
         log(f'Unable to content (len={len(content)}) to file {filepath}')
     return False
+
+

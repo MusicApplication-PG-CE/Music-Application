@@ -124,6 +124,8 @@ def update_ytdlp_async(done:ObjectValue,pipe:Async.Pipe):
     return pipe
 
 
+
+
 class Dependency:
     def __init__(self,name:str):
         self.name = name
@@ -142,6 +144,10 @@ class FileDependency(Dependency):
     def __init__(self,name:str,path:str):
         super().__init__(name)
         self.path = path
+        #ensure that the directories to the path exist
+        dirname = os.path.dirname(path)
+        os.makedirs(dirname,exist_ok=True)
+
 
     def hasDependency(self) -> bool:
         path = os.path.abspath(self.path)
@@ -179,6 +185,11 @@ class OnlineFileDependency(FileDependency):
     def installDependency(self, pipe: Async.Pipe):
         contents = fetchURL(pipe,self.url,f'Fetching {self.name} dependency')
         self.replaceAtomic(contents)
+
+try:
+    os.mkdir('./dep')
+except FileExistsError:
+    pass
 
 dependencies:list[Dependency] = [
     FFMPEGDependency(),

@@ -1,5 +1,6 @@
 from ...core import *
 from . import Aligner
+from ...core_elements import Space
 
 class SAligner(Aligner):
   def __init__(self, obj: 'Space', anchor_x: float, anchor_y: float, alignment_x: float = 0.5, alignment_y: float = 0.5):
@@ -8,7 +9,7 @@ class SAligner(Aligner):
 
   def onResize(self, size: tuple[int, int]):
     self.last_size = size
-    self.obj:Space
+    self.obj:'Space'
     s = self.obj
     nr = self.obj.rect.copy()
     nr.left = size[0] * self.anchor[0] - nr.width * self.alignment[0] + self.offset[0]

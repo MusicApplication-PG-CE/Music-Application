@@ -81,7 +81,7 @@ def getAudioMetaFromFileAsync(path:str):
         path = path.split(':',1)[-1]
     command = ['ffmpeg', '-hide_banner', '-i', f'{path}']
     
-    process = sp.Popen(command,stdout=sp.DEVNULL,stderr=sp.PIPE)
+    process = sp.Popen(command,stdout=sp.DEVNULL,stderr=sp.PIPE,creationflags=sp.CREATE_NO_WINDOW)
     p_out = b''
     while process.poll() is None:
         yield

@@ -1,14 +1,15 @@
 import time
 from typing import Any
-from src.Utils.Persistance import PersistantObject
+
+from src.Utils import (
+    NetLight,
+    logger,
+)
 from src.Utils.events import Event
 from src.Utils.fast import cache
-from src.Utils import logger #type: ignore
-from src.Utils import NetLight #type: ignore
-from pygame import constants as const
+from src.Utils.Persistance import PersistantObject
 
-with open('./Assets/version.txt','r') as file:
-    version = file.read().strip()
+version = 0,9 #major , minor
 
 UP_TO_DATE = True
 
@@ -69,9 +70,12 @@ settings = Settings()
 
 s = time.perf_counter()
 try:
-    response = NetLight.fetch('https://lgarciasanchez5450.github.io/static/assets/latest_version')
+    response = NetLight.fetch('https://musicapplication-pg-ce.github.io/static/app/version')
     if response.status_code == 200:
         UP_TO_DATE = response.body.decode().strip() == str(version).strip()
+        if __debug__:
+            logger.log('Current Version:',version,'\tOnline Version:',response.body.decode().strip())
+            
     logger.log("Time to check Latest Version: ",time.perf_counter()-s)
 except:
     logger.log("Error in Checking Latest Version: ",time.perf_counter()-s)
@@ -79,7 +83,7 @@ del s
 
 
 class SharedSettingValue:
-    __slots__ = 'obj','attr','on_set'
+    __slots__ = 'attr', 'obj', 'on_set'
     def __init__(self,obj,attr:str):
         self.obj = obj
         self.attr = attr

@@ -251,6 +251,8 @@ class MusicPlayer:
         if cls.volume_multiplier != target:
             if cls.pause_time == 0: 
                 v_mult = target
+                if v_mult <= 0:
+                    cls._setPaused(True)
             else:
                 slope = 1/cls.pause_time * dt
                 if cls.target_pause: 

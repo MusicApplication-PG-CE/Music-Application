@@ -52,7 +52,7 @@ def __download(url:str,onDone:typing.Callable,onUpdate:typing.Callable|None):
     if not url.startswith('https://'):
         url = 'https://'+url
     try:
-        cmd = subprocess.Popen(['dep/yt-dlp.exe','-x','--audio-format','vorbis',url,'--print','after_move:filepath','--progress','--embed-metadata'],stdout=PIPE,creationflags=subprocess.CREATE_NO_WINDOW,text=True)
+        cmd = subprocess.Popen(['./dep/yt-dlp.exe','-x','--audio-format','vorbis',url,'--print','after_move:filepath','--progress','--embed-metadata'],stdout=PIPE,creationflags=subprocess.CREATE_NO_WINDOW,text=True)
         logger.log("created Popen for url:",url)
         output = []
         last = ''
@@ -81,21 +81,28 @@ def __download(url:str,onDone:typing.Callable,onUpdate:typing.Callable|None):
         path = last.strip()
         name = path.split('\\')[-1]
         if not fileExists(name):
-            logger.log('YT-DLP file output not found, searching directory',name,end = '  -> ')
+            logger.log('YT-DLP file output not found, searching directory',name)
             name = list(filter(lambda x: x.endswith('.ogg'),os.listdir('.')))
+            logger.log(f'{len(name)} Possible Match(es)')
             if name:
+                logger.log('Finding Video ID from url:',url)
+                
                 try:
                     _,vid_id = url.rsplit('v=',1)
                 except: # the url is shortened
                     _,vid_id = url.rsplit('/',1)
+                logger.log('Video ID:',vid_id)
                 for filename in name:
                     if vid_id in filename:
                         name = filename
                         break
                 else:
                     name = name[0]
+                logger.log('Found Match:')
+                logger.log('Highest Probability Match:',name)
             else:
                 name = ''
+            
             logger.log(name)
         os.replace('./'+name,'./Database/__Music/'+name)
     except BaseException as err:
@@ -116,7 +123,7 @@ def yt_dlp_upgrade():
 def yt_dlp_upgrade_async():
     promise:Async.Promise[str] = Async.Promise()
     def __inner():
-        popen = subprocess.Popen(['yt-dlp.exe','--update-to', 'nightly','-v'],text=True,stdout=PIPE,stderr = STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+        popen = subprocess.Popen(['./dep/yt-dlp.exe','--update-to', 'nightly','-v'],text=True,stdout=PIPE,stderr = STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
     
         while (return_code := popen.poll()) is None:
             if popen.stdout:
@@ -159,7 +166,7 @@ def yt_dlp_upgrade_async():
 #         days += DAYS_IN_MONTH[i]
 #     return days + date[2]
 def yt_dlp_days_since_update():
-    last_modification = os.stat('./yt-dlp.exe').st_mtime
+    last_modification = os.stat('./dep/yt-dlp.exe').st_mtime
     seconds_since_update = time.time() - last_modification
     return seconds_since_update/(60*60*24)
 

@@ -1,9 +1,13 @@
-from typing import Callable
-from time import perf_counter
-try:from . import logger
-except: import logger #type: ignore
 import typing
-C = typing.TypeVar('C',bound=Callable)
+from collections import deque
+from collections.abc import Callable
+from time import perf_counter
+
+try:
+   from . import logger
+except ModuleNotFoundError: 
+   import logger
+C = typing.TypeVar('C',bound=typing.Callable)
 
 if __debug__:
   def profileFunc(func:Callable):
@@ -30,7 +34,7 @@ def profile(func:Callable):
   return wrapper
 
 if __debug__:
-    def profileGen(func:Callable[...,typing.Generator[typing.Any,typing.Any,typing.Any]]):
+    def profileGen(func:Callable[...,typing.Generator[typing.Any,typing.Any,typing.Any]]): # pyright: ignore[reportRedeclaration]
         def wrapper(*args,**kwargs):
             start = perf_counter()
             try:
@@ -62,11 +66,13 @@ def assertNeverThrows(func:Callable):
       return func(*args,**kwargs)
     except BaseException as err:
       logger.log(f"Assertion Failed! {func.__name__} raised Exception: {err}")
-      raise err
+      raise 
   return _wrapper_
 
 
-from collections import deque
+
+
+
 class Tracer:
     class MutableString: 
         def __init__(self):
@@ -134,6 +140,7 @@ class Tracer:
     else:
         def trace(self,func:Callable):
             return func
+        
     def show(self):
         import pygame
         if not __debug__: return
@@ -165,7 +172,7 @@ class Tracer:
             sat = (h&0xFF)%50+50
             val = h%50+50
             return pygame.Color.from_hsva(
-               hue,sat,val
+               hue,sat,val,1
             )
             return hash(s) & 0xFF_FF_FF
         @cache
@@ -212,8 +219,7 @@ class Tracer:
                         screen.blit(render_string(cur[2]), (start_x,y))
                         screen.blit(render_string(str(round(d_time,2))+t_suf), (start_x,y+10))
                     current_info = stack[-1][2].get()
-                    if current_info:
-                        if end_x-start_x > font.size(current_info)[0]:
+                    if current_info and end_x-start_x > font.size(current_info)[0]:
                             screen.blit(render_string(current_info),(start_x,y+20))
                     # End Draw Code
                     stack.pop()

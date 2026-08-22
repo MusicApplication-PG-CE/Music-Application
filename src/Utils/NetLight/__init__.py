@@ -120,7 +120,7 @@ def GET(socket:OpenedSocket,url:URL,headers:dict[str,str]|Headers):
     headers['Host'] = url.host #type: ignore
     _sendRequest(socket,'GET',url.inner_url,DEFAULT_HTTP_VERSION,headers,b'')
 
-def waitResponse(socket:OpenedSocket) -> Response:
+def waitResponse(socket:OpenedSocket):
     response = Response()
     file_descriptor = socket.file
     response.headers = Headers()

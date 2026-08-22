@@ -13,7 +13,6 @@ def parseContinuationToken(b:bytes,start:int=0,version:int=2):
     raise RuntimeError
 
 def parseVidRenderer(a:bytes,version:int):
-    
     #videoId
     c = utils.indexEnd(a,b'videoId":')
     videoId,c = utils.readWholeQuote(a,c)
@@ -96,6 +95,7 @@ def parseVidRenderer(a:bytes,version:int):
 
 
 def parse(b:bytes) -> tuple[list[types.YTVideo],str|None]:
+
     # c = utils.indexEnd(b,b'primaryContents')
     # c = utils.indexEnd(b,b'contents":[',c)
     # c = b.index(b'contents":',c)
